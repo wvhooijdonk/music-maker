@@ -1,0 +1,12 @@
+{
+  "name": "Flutter",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "remoteEnv": {
+    "PATH": "${containerEnv:PATH}:/home/vscode/flutter/bin"
+  },
+  "postCreateCommand": "bash .devcontainer/install-flutter.sh",
+  "forwardPorts": [8080],
+  "customizations": {
+    "vscode": { "extensions": ["Dart-Code.flutter"] }
+  }
+}
