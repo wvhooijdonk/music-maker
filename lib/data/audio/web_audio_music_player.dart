@@ -25,6 +25,11 @@ class WebAudioMusicPlayer implements MusicPlayer {
   final _soundingOscillators = <OscillatorNode>{};
 
   @override
+  void prepareOutput() {
+    (_context ??= AudioContext()).resume();
+  }
+
+  @override
   Stream<Duration> play(Score score) {
     stop();
     final context = _context ??= AudioContext();

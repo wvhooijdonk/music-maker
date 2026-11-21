@@ -5,6 +5,7 @@ import 'package:mijn_app/domain/entities/note.dart';
 import 'package:mijn_app/domain/entities/score.dart';
 import 'package:mijn_app/domain/entities/sheet_music_piece.dart';
 import 'package:mijn_app/domain/repositories/document_source.dart';
+import 'package:mijn_app/domain/repositories/link_opener.dart';
 import 'package:mijn_app/domain/repositories/music_player.dart';
 import 'package:mijn_app/domain/repositories/score_parser.dart';
 
@@ -60,8 +61,12 @@ class FakeMusicPlayer implements MusicPlayer {
   StreamController<Duration>? _progress;
   Score? playedScore;
   var stopCount = 0;
+  var preparedOutputCount = 0;
 
   bool get isPlaying => _progress != null;
+
+  @override
+  void prepareOutput() => preparedOutputCount++;
 
   @override
   Stream<Duration> play(Score score) {
@@ -84,4 +89,11 @@ class FakeMusicPlayer implements MusicPlayer {
     _progress?.close();
     _progress = null;
   }
+}
+
+class FakeLinkOpener implements LinkOpener {
+  final openedLinks = <Uri>[];
+
+  @override
+  Future<void> open(Uri link) async => openedLinks.add(link);
 }

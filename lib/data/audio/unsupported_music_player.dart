@@ -5,6 +5,9 @@ class UnsupportedMusicPlayer implements MusicPlayer {
   const UnsupportedMusicPlayer();
 
   @override
+  void prepareOutput() {}
+
+  @override
   Stream<Duration> play(Score score) => Stream.error(
     UnsupportedError('Afspelen wordt op dit platform nog niet ondersteund'),
   );

@@ -2,8 +2,11 @@ import '../../domain/entities/sheet_music_piece.dart';
 import '../../domain/repositories/sheet_music_catalog.dart';
 
 class MutopiaCatalog implements SheetMusicCatalog {
-  MutopiaCatalog({required Uri archiveBaseUri})
-    : pieces = List.unmodifiable([
+  MutopiaCatalog({Uri? archiveBaseUri})
+    : pieces = _pieces(archiveBaseUri ?? officialArchiveUri);
+
+  static List<SheetMusicPiece> _pieces(Uri archiveBaseUri) =>
+      List.unmodifiable([
         _piece(
           archiveBaseUri,
           title: 'Ode to Joy',
@@ -26,8 +29,6 @@ class MutopiaCatalog implements SheetMusicCatalog {
           fileName: 'anna-magdalena-04',
         ),
       ]);
-
-  static const webProxyPrefix = 'mutopia';
 
   static final officialArchiveUri = Uri.parse(
     'https://www.mutopiaproject.org/ftp/',

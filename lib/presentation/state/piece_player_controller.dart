@@ -4,10 +4,9 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../domain/entities/prepared_piece.dart';
 import '../../domain/entities/sheet_music_piece.dart';
-import '../../domain/repositories/document_source.dart';
 import '../../domain/repositories/music_player.dart';
-import '../../domain/repositories/score_parser.dart';
 import '../../domain/use_cases/prepare_piece.dart';
+import '../formatting/failure_message.dart';
 import 'piece_player_state.dart';
 
 class PiecePlayerController extends ChangeNotifier {
@@ -31,8 +30,17 @@ class PiecePlayerController extends ChangeNotifier {
       if (_isStillPreparing(piece)) _changeState(ReadyToPlay(prepared));
     } catch (error) {
       if (_isStillPreparing(piece)) {
-        _changeState(PreparationFailed(piece, _describe(error)));
+        _changeState(PreparationFailed(piece, describeFailure(error)));
       }
+    }
+  }
+
+  Future<void> playNow(SheetMusicPiece piece) async {
+    _musicPlayer.prepareOutput();
+    await select(piece);
+    if (_state case ReadyToPlay(:final prepared)
+        when identical(prepared.piece, piece)) {
+      start();
     }
   }
 
@@ -47,8 +55,9 @@ class PiecePlayerController extends ChangeNotifier {
         .play(prepared.score)
         .listen(
           (elapsed) => _changeState(Playing(prepared, elapsed: elapsed)),
-          onError: (Object error) =>
-              _changeState(PreparationFailed(prepared.piece, _describe(error))),
+          onError: (Object error) => _changeState(
+            PreparationFailed(prepared.piece, describeFailure(error)),
+          ),
           onDone: () => _returnToReady(prepared),
         );
   }
@@ -84,15 +93,4 @@ class PiecePlayerController extends ChangeNotifier {
     _state = state;
     notifyListeners();
   }
-
-  static String _describe(Object error) => switch (error) {
-    SheetMusicNotRecognizedException(:final reason) => reason,
-    DocumentFetchException() =>
-      'De bladmuziek kon niet worden gedownload. ($error)',
-    FormatException(:final message) =>
-      'De PDF kon niet worden gelezen: $message',
-    UnsupportedError(:final message) =>
-      message ?? 'Niet ondersteund op dit platform.',
-    _ => 'Er ging iets mis: $error',
-  };
 }
