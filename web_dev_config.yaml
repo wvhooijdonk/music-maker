@@ -1,0 +1,5 @@
+server:
+  proxy:
+    - prefix: "/mutopia/"
+      target: "https://www.mutopiaproject.org/"
+      replace: "/ftp/"

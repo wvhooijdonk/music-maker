@@ -17,6 +17,21 @@
 - `test/` volgt dezelfde indeling als `lib/`.
 - Afhankelijkheden wijzen alleen naar binnen, richting het domein.
 
+## Architectuur van de muziekspeler
+
+- `domain`: `SheetMusicPiece`, `Score`, `Note`, `Instrument`; interfaces `SheetMusicCatalog`, `DocumentSource`, `ScoreParser`, `MusicPlayer`; use case `PreparePiece` (downloaden en herkennen).
+- `data/pdf`: eigen PDF-lezer (objecten, FlateDecode, content streams) die glyphs met glyphnamen en paden in paginacoördinaten oplevert.
+- `data/sheet_music`: herkenning van bladmuziek uit vector-PDF's (notenbalken, maatstrepen, stokken, waardestrepen, bogen, sleutels, voortekening, punten, ties) naar een `Score`. Werkt voor digitaal gezette PDF's met benoemde muziekglyphs (zoals LilyPond/Mutopia); scans geven `SheetMusicNotRecognizedException`.
+- `data/audio`: Web Audio-synthese (`WebAudioMusicPlayer`) achter `MusicPlayer`; op Linux/Windows nog `UnsupportedMusicPlayer`.
+- `presentation`: `PiecePlayerController` (ChangeNotifier met `PiecePlayerState`) en widgets.
+- `main.dart` is de composition root.
+
+## Bladmuziek en proxy
+
+- Mutopia stuurt geen CORS-headers. In de browser gaan downloads daarom via de dev-server-proxy in `web_dev_config.yaml` (`/mutopia/` naar `https://www.mutopiaproject.org/ftp/`). Native platforms downloaden rechtstreeks.
+- Een productie-webbuild heeft een eigen proxy nodig.
+- `test/data/sheet_music/mutopia_recognition_test.dart` controleert de PDF-herkenning tegen de MIDI uit dezelfde Mutopia-bron (fixtures in `test/fixtures/mutopia`). De MIDI wordt alleen in tests gebruikt.
+
 ## Werkafspraken
 
 - Pas SOLID en clean architecture toe bij nieuwe features.
